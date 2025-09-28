@@ -1,17 +1,13 @@
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "esp_mac.h"
+#include "driver/gpio.h"
 
-#include "driver/i2c_master.h"
 #include "lcd_i2c.h"
 
 #define BLYNK_TEMPLATE_ID "TMPL6RFS_EsLd"
 #define BLYNK_TEMPLATE_NAME "Water Level Monitoring"
 #define BLYNK_AUTH_TOKEN "wu5HrRpRE07-dLJErpFe1ZGznUm6iCl7"
-
-#define EXAMPLE_I2C_HW_ADDR 0x27 // Common I2C address for LCD backpacks
-#define EXAMPLE_LCD_PIXEL_CLOCK_HZ 400000 // 400kHz is typical for I2C LCDs
-#define EXAMPLE_LCD_CMD_BITS 8 // Usually 8 bits for LCD commands
 
 #define LED1 2
 #define LED2 4
@@ -42,6 +38,22 @@ char auth[] = "wu5HrRpRE07-dLJErpFe1ZGznUm6iCl7";
 //Enter your WIFI SSID and password
 char ssid[] = "Oppo X";
 char pass[] = "oppo5298";
+
+void setup()
+{
+    gpio_set_direction(LED1, 2);
+    gpio_set_direction(LED2, 2);
+    gpio_set_direction(LED3, 2);
+    gpio_set_direction(LED4, 2);
+    gpio_set_direction(trig, 2);
+    gpio_set_direction(echo, 1);
+    gpio_set_direction(relay, 2);
+    gpio_set_direction(buzzer, 2);
+    gpio_set_level(relay, 1);
+
+    lcdInit();
+    
+}
 
 void app_main(void)
 {

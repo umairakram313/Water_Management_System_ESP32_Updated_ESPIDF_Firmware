@@ -9,7 +9,7 @@
 #define RS (1 << 0)   // P0
 #define RW (1 << 1)   // P1
 #define EN (1 << 2)   // P2
-#define BL (1 << 3)   // P3
+uint8_t BL = 0;   // P3 (modifiable, backlight control)
 
 #define D4 (1 << 4)
 #define D5 (1 << 5)
@@ -46,3 +46,5 @@ void lcdInit();
 void lcd_set_cursor(uint8_t row, uint8_t col);
 void lcd_write_string(char *string);
 void lcd_clear();
+void lcd_backlight_on();
+void lcd_backlight_off();

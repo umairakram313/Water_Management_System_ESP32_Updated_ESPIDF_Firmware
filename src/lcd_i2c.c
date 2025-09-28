@@ -80,3 +80,16 @@ void lcd_clear()
 {
     lcd_send_command(0x01);
 }
+
+void lcd_backlight_on()
+{
+    BL=(1<<3);
+    lcd_send_command(0x00);
+
+}
+
+void lcd_backlight_off()
+{
+    BL=0;
+    lcd_send_command(0x00);
+}
