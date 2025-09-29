@@ -52,7 +52,19 @@ void setup()
     gpio_set_level(relay, 1);
 
     lcdInit();
-    
+    lcd_backlight_on();
+}
+
+void blynk_begin(char* auth, char* ssid, char* pass)
+{
+    //connect wifi
+        //wifi.begin
+    //wifi config
+}
+
+void ultrasonic()
+{
+
 }
 
 void app_main(void)
