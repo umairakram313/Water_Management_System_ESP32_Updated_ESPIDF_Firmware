@@ -3,7 +3,9 @@
 #include "esp_mac.h"
 #include "driver/gpio.h"
 
+
 #include "lcd_i2c.h"
+#include "blynk_iot.h"
 
 #define BLYNK_TEMPLATE_ID "TMPL6RFS_EsLd"
 #define BLYNK_TEMPLATE_NAME "Water Level Monitoring"
@@ -51,23 +53,55 @@ void setup()
     gpio_set_direction(buzzer, 2);
     gpio_set_level(relay, 1);
 
+    blynk_begin(auth, ssid, pass);
+    blynk_subscribe(auth, 1, get_motorVal_frmCloud); // subscribe to V1 for motor control
     lcdInit();
     lcd_backlight_on();
+    lcd_set_cursor(0, 0);
+    lcd_write_string("System");
+    lcd_set_cursor(4,1);
+    lcd_write_string("Loading..");
+    vTaskDelay(pdMS_TO_TICKS(4000));
+    lcd_clear();
 }
 
-void blynk_begin(char* auth, char* ssid, char* pass)
-{
-    //connect wifi
-        //wifi.begin
-    //wifi config
-}
 
 void ultrasonic()
 {
+    gpio_set_level(trig, 0);
+    esp_rom_delay_us(4);
+    gpio_set_level(trig, 1);
+    esp_rom_delay_us(10);
+    gpio_set_level(trig, 0);
+    //finish this func???
 
+}
+
+void write_on_cloud()
+{
+
+}
+
+void update_lcd_buzzer()
+{
+
+}
+
+void get_motorVal_frmCloud(int pin, const char* value)
+{
+    if(strcmp(value, 1)==0)
+    {
+        gpio_set_level(relay, 0);
+        //lcd funcs, confirm col and row precede
+    }
+    else
+    {
+        gpio_set_level(relay, 1);
+        //lcd funcs, confirm col and row precede
+    }
 }
 
 void app_main(void)
 {
-
+    
 }

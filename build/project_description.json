@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "water-management",
-    "project_version":    "1",
+    "project_version":    "1ccc968-dirty",
     "project_path":       "C:/Users/PMLS/Documents/Projects/WMS/WMS_ESPIDF/water-management",
     "idf_path":           "C:/Users/PMLS/esp/v5.4/esp-idf",
     "build_dir":          "C:/Users/PMLS/Documents/Projects/WMS/WMS_ESPIDF/water-management/build",
@@ -1190,13 +1190,13 @@
             "dir": "C:/Users/PMLS/Documents/Projects/WMS/WMS_ESPIDF/water-management/main",
             "type": "LIBRARY",
             "lib": "__idf_main",
-            "reqs": [ "esp_driver_i2c", "src" ],
+            "reqs": [ "esp_driver_i2c", "src", "esp_wifi", "nvs_flash", "esp_netif", "esp_http_client" ],
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "C:/Users/PMLS/Documents/Projects/WMS/WMS_ESPIDF/water-management/build/esp-idf/main/libmain.a",
             "sources": [ "C:/Users/PMLS/Documents/Projects/WMS/WMS_ESPIDF/water-management/main/water-management.c" ],
-            "include_dirs": [ "." ]
+            "include_dirs": [ ".", "../include" ]
         },
         "mbedtls": {
             "alias": "idf::mbedtls",
@@ -1445,12 +1445,12 @@
             "dir": "C:/Users/PMLS/Documents/Projects/WMS/WMS_ESPIDF/water-management/src",
             "type": "LIBRARY",
             "lib": "__idf_src",
-            "reqs": [ "driver", "freertos" ],
+            "reqs": [ "driver", "freertos", "esp_wifi", "nvs_flash", "esp_netif", "esp_http_client" ],
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "C:/Users/PMLS/Documents/Projects/WMS/WMS_ESPIDF/water-management/build/esp-idf/src/libsrc.a",
-            "sources": [ "C:/Users/PMLS/Documents/Projects/WMS/WMS_ESPIDF/water-management/src/lcd_i2c.c" ],
+            "sources": [ "C:/Users/PMLS/Documents/Projects/WMS/WMS_ESPIDF/water-management/src/blynk_iot.c", "C:/Users/PMLS/Documents/Projects/WMS/WMS_ESPIDF/water-management/src/lcd_i2c.c" ],
             "include_dirs": [ ".", "../include" ]
         },
         "tcp_transport": {
@@ -2856,11 +2856,11 @@
             "prefix": "idf",
             "dir": "C:/Users/PMLS/Documents/Projects/WMS/WMS_ESPIDF/water-management/main",
             "lib": "__idf_main",
-            "reqs": [ "esp_driver_i2c", "src" ],
+            "reqs": [ "esp_driver_i2c", "src", "esp_wifi", "nvs_flash", "esp_netif", "esp_http_client" ],
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "include_dirs": [ "." ]
+            "include_dirs": [ ".", "../include" ]
         },
         "src": {
             "alias": "idf::src",
@@ -2868,7 +2868,7 @@
             "prefix": "idf",
             "dir": "C:/Users/PMLS/Documents/Projects/WMS/WMS_ESPIDF/water-management/src",
             "lib": "__idf_src",
-            "reqs": [ "driver", "freertos" ],
+            "reqs": [ "driver", "freertos", "esp_wifi", "nvs_flash", "esp_netif", "esp_http_client" ],
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],

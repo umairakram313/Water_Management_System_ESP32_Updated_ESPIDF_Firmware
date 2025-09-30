@@ -1,5 +1,26 @@
 #include "lcd_i2c.h"
 
+uint8_t BL = 0;
+
+i2c_master_bus_config_t i2c_mst_config = {
+    .clk_source = I2C_CLK_SRC_DEFAULT,
+    .i2c_port = 0,
+    .scl_io_num = 22,
+    .sda_io_num = 21,
+    .glitch_ignore_cnt = 7,
+    .flags.enable_internal_pullup = true,
+};
+
+i2c_master_bus_handle_t bus_handle;
+
+i2c_device_config_t dev_cfg = {
+    .dev_addr_length = I2C_ADDR_BIT_LEN_7,
+    .device_address = 0x27,
+    .scl_speed_hz = 100000,
+};
+
+i2c_master_dev_handle_t dev_handle;
+
 void pcf8574write(uint8_t buffer)
 {
     ESP_ERROR_CHECK(i2c_master_transmit(dev_handle, &buffer, 1, -1));
