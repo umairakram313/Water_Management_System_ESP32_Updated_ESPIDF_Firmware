@@ -2,7 +2,8 @@
 #include "freertos/FreeRTOS.h"
 #include "esp_mac.h"
 #include "driver/gpio.h"
-
+#include "driver/adc.h"
+#include <esp_timer.h>
 
 #include "lcd_i2c.h"
 #include "blynk_iot.h"
@@ -33,13 +34,29 @@ long t;
 int distance;
 int blynkDistance;
 
-
+adc1_channel_t adc_channel= ADC1_CHANNEL_3;
+adc_atten_t atten_channel = ADC_ATTEN_DB_11;
 // Enter your Auth token
 char auth[] = "wu5HrRpRE07-dLJErpFe1ZGznUm6iCl7";
 
 //Enter your WIFI SSID and password
 char ssid[] = "Oppo X";
 char pass[] = "oppo5298";
+
+void get_motorVal_frmCloud(int pin, const char* value)
+{
+    if(strcmp(value, "1")==0)
+    {
+        gpio_set_level(relay, 0);
+        //lcd funcs, confirm col and row precede
+    }
+    else
+    {
+        gpio_set_level(relay, 1);
+        //lcd funcs, confirm col and row precede
+    }
+}
+
 
 void setup()
 {
@@ -53,6 +70,9 @@ void setup()
     gpio_set_direction(buzzer, 2);
     gpio_set_level(relay, 1);
 
+    adc1_config_channel_atten(ADC1_CHANNEL_3, ADC_ATTEN_DB_11);
+    adc1_config_width(ADC_WIDTH_BIT_12);
+
     blynk_begin(auth, ssid, pass);
     blynk_subscribe(auth, 1, get_motorVal_frmCloud); // subscribe to V1 for motor control
     lcdInit();
@@ -65,6 +85,34 @@ void setup()
     lcd_clear();
 }
 
+uint32_t pulse_in(uint8_t pin, uint8_t pin_level, uint32_t timeout_us)
+{
+    uint32_t start_time=esp_timer_get_time();
+    uint32_t now=0;
+
+    while(gpio_get_level(echo)==pin_level)
+    {
+        now = esp_timer_get_time();
+        if(now-start_time>timeout_us)
+            return 0;
+    }
+
+    
+    while(gpio_get_level(echo)!=pin_level)
+    {
+        now = esp_timer_get_time();
+        if(now-start_time>timeout_us)
+            return 0;
+    }
+    uint32_t pulse_start=esp_timer_get_time();
+    while(gpio_get_level(echo)==pin_level)
+    {
+        now=esp_timer_get_time();
+        if(now-start_time>timeout_us)
+            return 0;
+    }
+    return (now-pulse_start);
+}
 
 void ultrasonic()
 {
@@ -73,35 +121,109 @@ void ultrasonic()
     gpio_set_level(trig, 1);
     esp_rom_delay_us(10);
     gpio_set_level(trig, 0);
-    //finish this func???
+    t=pulse_in(echo, 1, 30000);
+    distance = t / 29 / 2;   
 
 }
 
 void write_on_cloud()
 {
-
+    blynkDistance = (distance - MaxLevel) * -1;
+    if(distance<=MaxLevel)
+    {
+        blynk_virtual_write(auth, 0, blynkDistance);
+    }
+    else
+    {
+        blynk_virtual_write(auth, 0, 0);
+    }
 }
 
 void update_lcd_buzzer()
 {
-
-}
-
-void get_motorVal_frmCloud(int pin, const char* value)
-{
-    if(strcmp(value, 1)==0)
+    lcd_set_cursor(0,0);
+    lcd_write_string("WLevel:");
+    val=adc1_get_raw(adc_channel);
+    if(val>750)
     {
-        gpio_set_level(relay, 0);
-        //lcd funcs, confirm col and row precede
+        gpio_set_level(relay, 1);
+        blynk_virtual_write(auth, 1, 0);
+        lcd_set_cursor(8,0);
+        lcd_write_string("Exceeded");
+        if(lo==0)
+        {
+            gpio_set_level(buzzer, 1);
+            vTaskDelay(pdMS_TO_TICKS(2000));
+            gpio_set_level(buzzer, 0);
+            lo++;
+        }
+        lcd_set_cursor(0,1);
+        lcd_write_string("Motor is OFF");
     }
     else
     {
-        gpio_set_level(relay, 1);
-        //lcd funcs, confirm col and row precede
+        if(Level1<=distance)
+        {
+            lcd_set_cursor(8,0);
+            lcd_write_string("Very Low");
+            gpio_set_level(LED1, 0);
+            gpio_set_level(LED2, 0);
+            gpio_set_level(LED3, 0);
+            gpio_set_level(LED4, 0);
+        }
+        else if(Level2<=distance && Level1>distance)
+        {
+            lcd_set_cursor(8,0);
+            lcd_write_string("Low");
+            lcd_write_string("      ");
+            gpio_set_level(LED1, 1);
+            gpio_set_level(LED2, 0);
+            gpio_set_level(LED3, 0);
+            gpio_set_level(LED4, 0);
+        }
+        else if(Level3<=distance && Level2>distance)
+        {
+            lcd_set_cursor(8,0);
+            lcd_write_string("Medium");
+            lcd_write_string("      ");
+            gpio_set_level(LED1, 1);
+            gpio_set_level(LED2, 1);
+            gpio_set_level(LED3, 0);
+            gpio_set_level(LED4, 0);
+        }
+        else if(Level4<=distance && Level3 >distance)
+        {
+            lcd_set_cursor(8,0);
+            lcd_write_string("Almost Full");
+            lcd_write_string("      ");
+            gpio_set_level(LED1, 1);
+            gpio_set_level(LED2, 1);
+            gpio_set_level(LED3, 1);
+            gpio_set_level(LED4, 0);
+        }
+        else if(Level4 >distance)
+        {
+            lcd_set_cursor(8,0);
+            lcd_write_string("Full");
+            lcd_write_string("      ");
+            gpio_set_level(LED1, 1);
+            gpio_set_level(LED2, 1);
+            gpio_set_level(LED3, 1);
+            gpio_set_level(LED4, 1);
+        }
     }
 }
 
+
 void app_main(void)
 {
+    setup();
+    while(1)
+    {
+        blynk_run();
+        ultrasonic();
+        write_on_cloud();
+        update_lcd_buzzer();
+    }
     
 }
