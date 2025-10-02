@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "water-management",
-    "project_version":    "af8719e-dirty",
+    "project_version":    "0c0fa9b-dirty",
     "project_path":       "C:/Users/PMLS/Documents/Projects/WMS/WMS_ESPIDF/water-management",
     "idf_path":           "C:/Users/PMLS/esp/v5.4/esp-idf",
     "build_dir":          "C:/Users/PMLS/Documents/Projects/WMS/WMS_ESPIDF/water-management/build",

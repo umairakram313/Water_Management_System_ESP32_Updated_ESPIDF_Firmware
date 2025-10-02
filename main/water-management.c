@@ -155,7 +155,7 @@ void update_lcd_buzzer()
 {
     lcd_set_cursor(0,0);
     lcd_write_string("WLevel:");
-    adc_oneshot_read(adc_unit_handle, ADC_CHANNEL_4, &val);
+    adc_oneshot_read(adc_unit_handle, ADC_CHANNEL_3, &val);
     if(val>750)
     {
         gpio_set_level(relay, 1);
@@ -227,15 +227,59 @@ void update_lcd_buzzer()
 }
 
 
+//RTOS Tasks
+
+void ultrasonic_task(void* PvParameters)
+{
+    while(1)
+    {
+        ultrasonic();
+    }
+}
+
+void write_cloud_task(void* PvParameters)
+{
+    while(1)
+    {
+        write_on_cloud();
+    }
+}
+
+void update_lcd_buzzer_task(void* PvParameters)
+{
+    while (1)
+    {
+        update_lcd_buzzer();
+    }
+}
+
+void blynk_run_task(void* PvParameters)
+{
+    while (1)
+    {
+        blynk_run();
+    }
+}
+
 void app_main(void)
 {
     setup();
-    while(1)
+    static uint8_t ucParametersToPass;
+    TaskHandle_t xhandle=NULL;
+
+    //Q. are there problems in the following line?
+    //Ans: 
+    xTaskCreate(ultrasonic_task, "Ultrasonic", XT_STACK_MIN_SIZE, &ucParametersToPass, 1, &xhandle);
+    xTaskCreate(write_cloud_task, "Write_Cloud", XT_STACK_MIN_SIZE, &ucParametersToPass, 1, &xhandle);
+    xTaskCreate(update_lcd_buzzer_task, "Update_LCD_Buzzer", XT_STACK_MIN_SIZE, &ucParametersToPass, 1, &xhandle);
+    xTaskCreate(blynk_run_task, "Blynk_Run", XT_STACK_MIN_SIZE, &ucParametersToPass, 1, &xhandle);
+
+    /*while(1)
     {
         blynk_run();
         ultrasonic();
         write_on_cloud();
         update_lcd_buzzer();
-    }
+    }*/
     
 }
