@@ -234,6 +234,7 @@ void ultrasonic_task(void* PvParameters)
     while(1)
     {
         ultrasonic();
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
@@ -242,6 +243,7 @@ void write_cloud_task(void* PvParameters)
     while(1)
     {
         write_on_cloud();
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
@@ -250,6 +252,7 @@ void update_lcd_buzzer_task(void* PvParameters)
     while (1)
     {
         update_lcd_buzzer();
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
@@ -258,6 +261,7 @@ void blynk_run_task(void* PvParameters)
     while (1)
     {
         blynk_run();
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
 
@@ -269,10 +273,10 @@ void app_main(void)
 
     //Q. are there problems in the following line?
     //Ans: 
-    xTaskCreate(ultrasonic_task, "Ultrasonic", XT_STACK_MIN_SIZE, &ucParametersToPass, 1, &xhandle);
-    xTaskCreate(write_cloud_task, "Write_Cloud", XT_STACK_MIN_SIZE, &ucParametersToPass, 1, &xhandle);
-    xTaskCreate(update_lcd_buzzer_task, "Update_LCD_Buzzer", XT_STACK_MIN_SIZE, &ucParametersToPass, 1, &xhandle);
-    xTaskCreate(blynk_run_task, "Blynk_Run", XT_STACK_MIN_SIZE, &ucParametersToPass, 1, &xhandle);
+    xTaskCreate(ultrasonic_task, "Ultrasonic", 4096, NULL, 1, &xhandle);
+    xTaskCreate(write_cloud_task, "Write_Cloud", 4096, NULL, 1, &xhandle);
+    xTaskCreate(update_lcd_buzzer_task, "Update_LCD_Buzzer", 4096, NULL, 2, &xhandle);
+    xTaskCreate(blynk_run_task, "Blynk_Run", 4096, NULL, 3, &xhandle);
 
     /*while(1)
     {
