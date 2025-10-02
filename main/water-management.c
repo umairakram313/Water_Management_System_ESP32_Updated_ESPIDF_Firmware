@@ -2,7 +2,7 @@
 #include "freertos/FreeRTOS.h"
 #include "esp_mac.h"
 #include "driver/gpio.h"
-#include "driver/adc.h"
+#include "esp_adc/adc_oneshot.h"
 #include <esp_timer.h>
 
 #include "lcd_i2c.h"
@@ -34,8 +34,20 @@ long t;
 int distance;
 int blynkDistance;
 
-adc1_channel_t adc_channel= ADC1_CHANNEL_3;
-adc_atten_t atten_channel = ADC_ATTEN_DB_11;
+adc_oneshot_unit_init_cfg_t adc_unit_conf=
+{
+    .unit_id=ADC_UNIT_1,
+    .ulp_mode=ADC_ULP_MODE_DISABLE,
+};
+
+adc_oneshot_unit_handle_t adc_unit_handle;
+
+adc_oneshot_chan_cfg_t adc_channel_conf=
+{
+    .atten=ADC_ATTEN_DB_12,
+    .bitwidth=ADC_BITWIDTH_12
+};
+
 // Enter your Auth token
 char auth[] = "wu5HrRpRE07-dLJErpFe1ZGznUm6iCl7";
 
@@ -70,8 +82,8 @@ void setup()
     gpio_set_direction(buzzer, 2);
     gpio_set_level(relay, 1);
 
-    adc1_config_channel_atten(ADC1_CHANNEL_3, ADC_ATTEN_DB_11);
-    adc1_config_width(ADC_WIDTH_BIT_12);
+    adc_oneshot_new_unit(&adc_unit_conf, &adc_unit_handle);
+    adc_oneshot_config_channel(adc_unit_handle, ADC_CHANNEL_4, &adc_channel_conf);
 
     blynk_begin(auth, ssid, pass);
     blynk_subscribe(auth, 1, get_motorVal_frmCloud); // subscribe to V1 for motor control
@@ -143,7 +155,7 @@ void update_lcd_buzzer()
 {
     lcd_set_cursor(0,0);
     lcd_write_string("WLevel:");
-    val=adc1_get_raw(adc_channel);
+    adc_oneshot_read(adc_unit_handle, ADC_CHANNEL_4, &val);
     if(val>750)
     {
         gpio_set_level(relay, 1);
